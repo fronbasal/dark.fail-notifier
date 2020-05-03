@@ -27,10 +27,14 @@ class DarkFailScraper:
         """
         res = self.session.get(self.url)
         data = res.html.find(".status0") or res.html.find(".status2")
-        data_content = data[0].text
-        onion_link, self.last_online = [
-            s.strip() for s in str(data_content).split("- Last Online: ")
-        ]
+        if len(data) > 0:
+            data_content = data[0].text
+            onion_link, self.last_online = [
+                s.strip() for s in str(data_content).split("- Last Online: ")
+            ]
+        else:
+            onion_link = res.html.find(".status1", first=True).text.strip()
+            self.last_online = None
         is_online = res.html.find(".site_online", first=True).text != "No."
         if self.is_online != is_online or self.onion_link != onion_link:
             self.onion_link = onion_link
